@@ -46,6 +46,22 @@ function createOrbitBalls(object, numBalls = 2) {
     }
 }
 
+/*function animateOrbitBalls(object, time) {
+    const speed = 0.02; // Velocidade angular
+    const a = 1.0;  // Semi-eixo maior (raio no eixo X)
+    const b = 0.5;  // Semi-eixo menor (raio no eixo Z)
+
+    object.balls.forEach((ball, index) => {
+        ball.theta += speed; // Incrementa o ângulo para mover a bola na órbita
+
+        // Atualiza a posição da bola usando coordenadas elípticas
+        ball.position.x = object.position.x + a * Math.cos(ball.theta); // Posição X (semi-eixo maior)
+        ball.position.z = object.position.z + b * Math.sin(ball.theta); // Posição Z (semi-eixo menor)
+
+        // Movimento vertical (y) usando uma oscilação senoidal (opcional)
+        ball.position.y = object.position.y + amplitude * Math.sin(frequency * time + (index % 2 === 0 ? 0 : Math.PI));
+    });
+}*/
 
 enemies.forEach(enemy => createOrbitBalls(enemy, 2));
 
