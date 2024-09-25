@@ -11,6 +11,13 @@ document.body.appendChild(renderer.domElement);
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 const material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
 
+// teste de projetil
+const spheregeometry = new THREE.SphereGeometry(0.5);
+const spherematerial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: false });
+const sphere = new THREE.Mesh(spheregeometry, spherematerial);
+sphere.position.set(0, 1, 0);
+scene.add(sphere);
+
 const terreno = 10;
 const cubes = [];
 
@@ -62,6 +69,24 @@ function updateCamera() {
     camera.lookAt(player.position);
 }
 
+function moveTo(object, targetX, targetZ, speed) {
+    object.userData.target = new THREE.Vector3(targetX, 1, targetZ);
+    object.userData.speed = speed;
+}
+
+function updateObjectMovement(object) {
+    if (object.userData.target) {
+        const direction = new THREE.Vector3().subVectors(object.userData.target, object.position).normalize();
+        const distance = object.userData.speed * 0.5;
+        object.position.add(direction.multiplyScalar(distance));
+
+        if (object.position.distanceTo(object.userData.target) < distance) {
+            object.position.copy(object.userData.target);
+            object.userData.target = null;
+        }
+    }
+}
+
 // Testando implementações de Raycaster com click do mouse
 function onMouseClick(event) {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -71,6 +96,8 @@ function onMouseClick(event) {
     if (intersects.length > 0) {
         const intersectedCube = intersects[0].object;
         console.log('Cubo clicado:', intersectedCube.position);
+        sphere.position.set(player.position.x, player.position.y, player.position.z);
+        moveTo(sphere, intersectedCube.position.x, intersectedCube.position.z, 0.5);
     }
 }
 
@@ -80,6 +107,8 @@ function animate() {
     requestAnimationFrame(animate);
     movePlayer();
     updateCamera();
+    cubes.forEach(updateObjectMovement);
+    updateObjectMovement(sphere); 
     renderer.render(scene, camera);
     stats.update();
 }
