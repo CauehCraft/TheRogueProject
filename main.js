@@ -12,11 +12,54 @@ const geometry = new THREE.BoxGeometry(1, 1, 1);
 const material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
 
 // teste de projetil
-const spheregeometry = new THREE.SphereGeometry(0.5);
+const spheregeometry = new THREE.SphereGeometry(0.25);
 const spherematerial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: false });
 const sphere = new THREE.Mesh(spheregeometry, spherematerial);
 sphere.position.set(0, 1, 0);
 scene.add(sphere);
+
+// teste de projeteis orbitando inimigos
+const enemies = [];
+for(let i = 0; i<3; i++){
+    const enemygeometry = new THREE.SphereGeometry(0.5, 15);
+    const enemymaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: true });
+    const enemy = new THREE.Mesh(enemygeometry, enemymaterial);
+    enemy.position.set(-i*2, 1, i*2);
+    scene.add(enemy);
+    enemies.push(enemy);
+}
+
+function createOrbitBalls(object, numBalls = 2) {
+    object.balls = [];
+    const raio = 0.7;
+    for (let i = 0; i < numBalls; i++) {
+        const ballgeometry = new THREE.SphereGeometry(0.2);
+        const ballmaterial = new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: false });
+        const ball = new THREE.Mesh(ballgeometry, ballmaterial);
+        
+        // Ângulo inicial para cada bola
+        ball.theta = (i / numBalls) * Math.PI * 2;
+        ball.R = raio;
+        
+        scene.add(ball);
+        object.balls.push(ball);
+    }
+}
+
+
+enemies.forEach(enemy => createOrbitBalls(enemy, 2));
+
+const amplitude = 0.3;
+const frequency = 4;
+function animateOrbitBalls(object, time) {
+    const speed = 0.02;
+    object.balls.forEach((ball, index) => {
+        ball.theta += speed;
+        ball.position.x = object.position.x + ball.R * Math.cos(ball.theta);
+        ball.position.z = object.position.z + ball.R * Math.sin(ball.theta);
+        ball.position.y = object.position.y + amplitude * Math.sin(frequency * time + (index % 2 === 0 ? 0 : Math.PI));
+    });
+}
 
 const terreno = 10;
 const cubes = [];
@@ -32,14 +75,15 @@ for (let x = 0; x < terreno; x++) {
 }
 
 // Cubo pra exemplo de personagem
-const playerGeometry = new THREE.BoxGeometry(1, 1, 1);
+const playerGeometry = new THREE.BoxGeometry(1, 2, 1);
 const playerMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 const player = new THREE.Mesh(playerGeometry, playerMaterial);
 player.position.y = 1;
 scene.add(player);
 
 // Câmera com perspectiva isométrica
-camera.position.set(10, 10, 10);
+const camera_distance = 5;
+camera.position.set(camera_distance, camera_distance, camera_distance);
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 // Contador de FPS
@@ -65,7 +109,7 @@ function movePlayer() {
 
 // Função para manter a camera fixa em relação ao personagem
 function updateCamera() {
-    camera.position.set(player.position.x + 10, player.position.y + 10, player.position.z + 10);
+    camera.position.set(player.position.x + camera_distance, player.position.y + camera_distance + 1, player.position.z + camera_distance);
     camera.lookAt(player.position);
 }
 
@@ -102,13 +146,15 @@ function onMouseClick(event) {
 }
 
 window.addEventListener('click', onMouseClick, false);
-
+const clock = new THREE.Clock();
 function animate() {
     requestAnimationFrame(animate);
     movePlayer();
     updateCamera();
     cubes.forEach(updateObjectMovement);
     updateObjectMovement(sphere); 
+    const time = clock.getElapsedTime();
+    enemies.forEach(enemy => animateOrbitBalls(enemy, time));
     renderer.render(scene, camera);
     stats.update();
 }
