@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import CollisionSystem from '../systems/CollisionSystem.js';
 
 class Projectile {
     constructor(position, direction, speed) {
@@ -11,9 +12,19 @@ class Projectile {
         this.speed = speed;
     }
 
-    update() {
+    update(enemies, scene, projectiles) {
         this.mesh.position.add(this.direction.clone().multiplyScalar(this.speed));
+    
+        enemies.forEach((enemy, enemyIndex) => {
+            if (CollisionSystem.checkCollision(this.mesh, enemy.mesh)) {
+                scene.remove(this.mesh);
+                projectiles.splice(projectiles.indexOf(this), 1);
+                scene.remove(enemy.mesh);
+                enemies.splice(enemyIndex, 1);
+            }
+        });
     }
+    
 }
 
 export default Projectile;
