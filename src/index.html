@@ -16,6 +16,22 @@
 		</script>
 	</head>
 	<body>
+		<div id="hud">
+			<div id="ammo">Munição: 10</div>
+			<div id="health">Vida: 100</div>
+		</div>
+		
+		<style>
+			#hud {
+				position: absolute;
+				top: 95%;
+				left: 1%;
+				color: white;
+				background-color: rgba(0, 0, 0, 0.26);
+				pointer-events: none;
+				user-select: none;
+			}
+		</style>
 		<script type="module" src="main.js"></script>
 	</body>
 </html>
