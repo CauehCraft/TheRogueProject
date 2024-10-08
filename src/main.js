@@ -89,5 +89,4 @@ function animate() {
     stats.update();
 }
 
-
 animate();
