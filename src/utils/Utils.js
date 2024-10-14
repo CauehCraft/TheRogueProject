@@ -29,12 +29,12 @@ class Utils {
     // Configuração das sombras
     light.shadow.camera.near = 1;
     light.shadow.camera.far = 10;
-    light.shadow.camera.right = 15;
-    light.shadow.camera.left = -15;
-    light.shadow.camera.top = 15;
-    light.shadow.camera.bottom = -15;
-    light.shadow.mapSize.width = 1024;
-    light.shadow.mapSize.height = 1024;
+    light.shadow.camera.right = 45;
+    light.shadow.camera.left = -45;
+    light.shadow.camera.top = 45;
+    light.shadow.camera.bottom = -45;
+    light.shadow.mapSize.width = 2048;
+    light.shadow.mapSize.height = 2048;
 
     scene.add(light);
     scene.add(light.target);
@@ -47,7 +47,7 @@ class Utils {
     const shadowCameraHelper = new THREE.CameraHelper(light.shadow.camera);
     scene.add(shadowCameraHelper);
     const lightShadowMapViewer = new ShadowMapViewer(light);
-    const size = window.innerWidth * 0.15;
+    const size = window.innerWidth * 0.30;
     lightShadowMapViewer.position.set(10, 10);
     lightShadowMapViewer.size.set(size, size);
     lightShadowMapViewer.update();
