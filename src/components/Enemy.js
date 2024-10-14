@@ -9,7 +9,7 @@ class Enemy {
         this.particleSystems = [];  // Armazena os sistemas de partículas
 
         this.loadModel(position);
-        this.createOrbitBalls(scene, 3);  // 2 bolas orbitais
+        this.createOrbitBalls(scene, 3);  // 3 bolas orbitais
     }
 
     loadModel(position) {
@@ -33,7 +33,12 @@ class Enemy {
         const raio = 0.7;
         for (let i = 0; i < numBalls; i++) {
             const ballGeometry = new THREE.SphereGeometry(0.15, 5, 4);
-            const ballMaterial = new THREE.MeshLambertMaterial({ color: 0xff00ff, wireframe: false });
+            const ballMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0xff4500, 
+                transparent: true,
+                opacity: 0.8,
+                wireframe: false 
+            });
             const ball = new THREE.Mesh(ballGeometry, ballMaterial);
             ball.castShadow = true;
             ball.receiveShadow = true;
@@ -54,20 +59,28 @@ class Enemy {
         const particleCount = 100;
         const particlesGeometry = new THREE.BufferGeometry();
         const positions = new Float32Array(particleCount * 3);
+        const velocities = new Float32Array(particleCount * 3);  // Adiciona velocidades para cada partícula
 
-        // Define as posições iniciais das partículas em torno da bola
+        // Define as posições e as velocidades iniciais das partículas em torno da bola
         for (let i = 0; i < particleCount; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const radius = 0.2 + Math.random() * 0.1;  // Raio ao redor da bola
+            const radius = 0.2 + Math.random() * 0.05;  // Raio ao redor da bola
             const x = ball.position.x + radius * Math.cos(angle);
-            const y = ball.position.y + (Math.random() - 0.5) * 0.1;  // Flutuação leve no eixo y
+            const y = ball.position.y + (Math.random() - 0.5) * 0.1;
             const z = ball.position.z + radius * Math.sin(angle);
+            
             positions[i * 3] = x;
             positions[i * 3 + 1] = y;
             positions[i * 3 + 2] = z;
+
+            // Define uma velocidade inicial para as partículas (movimento radial)
+            velocities[i * 3] = (Math.random() - 0.5) * 0.02;  // Movimento leve no eixo X
+            velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.02;  // Movimento leve no eixo Y
+            velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;  // Movimento leve no eixo Z
         }
 
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
 
         // Material das partículas simulando fogo
         const particlesMaterial = new THREE.PointsMaterial({
@@ -99,17 +112,34 @@ class Enemy {
     }
 
     animateParticles(time) {
-        this.particleSystems.forEach(({ particleSystem, ball }, index) => {
+        this.particleSystems.forEach(({ particleSystem, ball }) => {
             const positions = particleSystem.geometry.attributes.position.array;
+            const velocities = particleSystem.geometry.attributes.velocity.array;
             const numParticles = positions.length / 3;
 
-            // Anima as partículas para seguir o movimento da bola e simular o fogo
+            // Anima as partículas em torno da bola
             for (let i = 0; i < numParticles; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const radius = 0.2 + Math.random() * 0.1;  // Raio ao redor da bola
-                positions[i * 3] = ball.position.x + radius * Math.cos(angle);
-                positions[i * 3 + 1] = ball.position.y + (Math.random() - 0.5) * 0.1;  // Movimento vertical suave
-                positions[i * 3 + 2] = ball.position.z + radius * Math.sin(angle);
+                positions[i * 3] += velocities[i * 3];       // Movimento no eixo X
+                positions[i * 3 + 1] += velocities[i * 3 + 1]; // Movimento no eixo Y
+                positions[i * 3 + 2] += velocities[i * 3 + 2]; // Movimento no eixo Z
+
+                const dx = positions[i * 3] - ball.position.x;
+                const dz = positions[i * 3 + 2] - ball.position.z;
+                const distance = Math.sqrt(dx * dx + dz * dz);
+
+                // Verifica se a partícula saiu do alcance definido (raio ao redor da bola)
+                if (distance > 0.3) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = 0.2 + Math.random() * 0.05;
+                    positions[i * 3] = ball.position.x + radius * Math.cos(angle);
+                    positions[i * 3 + 1] = ball.position.y + (Math.random() - 0.5) * 0.1;
+                    positions[i * 3 + 2] = ball.position.z + radius * Math.sin(angle);
+
+                    // Redefine uma nova velocidade para a partícula
+                    velocities[i * 3] = (Math.random() - 0.5) * 0.02;
+                    velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
+                    velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
+                }
             }
 
             particleSystem.geometry.attributes.position.needsUpdate = true;
