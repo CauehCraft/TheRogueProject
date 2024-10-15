@@ -8,10 +8,11 @@ import Enemy from './components/Enemy.js';
 import Utils from './utils/Utils.js';
 
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xc2d0df);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 // const camera = new THREE.OrthographicCamera( window.innerWidth / - 150, window.innerWidth / 150, window.innerHeight / 150, window.innerHeight / - 150, 1, 1000 );
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.shadowMap.enabled = true;
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -19,7 +20,7 @@ document.body.appendChild(renderer.domElement);
 window.addEventListener('resize', (event) => Utils.onWindowResize(camera, renderer));
 
 const player = new Player(scene, 'assets/models/mutant.fbx');
-const terrain = new Terrain(scene, 30);
+const terrain = new Terrain(scene, 30, 1, 64, 1, 'assets/textures/Ground3.png', 'assets/textures/Lava.png');
 
 Utils.addLightAndShadows(scene);
 
