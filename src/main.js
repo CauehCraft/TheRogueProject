@@ -35,6 +35,8 @@ const projectiles = [];
 // Distancia da camera ao player
 const cameraDistance = 5;
 
+const clock = new THREE.Clock();
+
 // Contador de fps
 const stats = new Stats();
 document.body.appendChild(stats.dom);
@@ -60,19 +62,14 @@ function onMouseClick(event) {
         projectileStartPosition.y = 1;
         // Calcula o vetor unitario de direção com base na diferença de dois vetores (Vector3) de posição
         const direction = new THREE.Vector3().subVectors(targetPosition, projectileStartPosition).normalize();
-
-        player.shoot(scene, projectiles, direction, projectileStartPosition);
-
-        // const projectile = new Projectile(projectileStartPosition, direction, 0.5);
-        // projectiles.push(projectile);
-        // scene.add(projectile.mesh);
+        const delta = clock.getDelta();
+        player.shoot(scene, projectiles, direction, projectileStartPosition, delta);
     }
 }
 
 
 window.addEventListener('click', onMouseClick, false);
 
-const clock = new THREE.Clock();
 function animate() {
     requestAnimationFrame(animate);
 
@@ -83,8 +80,7 @@ function animate() {
     const delta = clock.getDelta();
     player.update(delta, camera, cameraDistance);
     const time = clock.getElapsedTime();
-    enemies.forEach(enemy => enemy.animateOrbitBalls(time));
-    // terrain.cubes.forEach(cube => terrain.updateObjectMovement(cube));
+    enemies.forEach(enemy => enemy.update(time, delta, player, scene));
     renderer.render(scene, camera);
     stats.update();
 }
