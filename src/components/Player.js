@@ -23,6 +23,8 @@ class Player {
         this.health = 100;
         this.damage = 35;
         this.isDied = false;
+        this.cameraOrbitAngle = 0;
+        this.currentCameraDistance = 0
 
         window.addEventListener('keydown', (event) => this.keys[event.key] = true);
         window.addEventListener('keyup', (event) => this.keys[event.key] = false);
@@ -104,6 +106,7 @@ class Player {
             if (this.keys['a']) {direction.x -= 1; direction.z += 1;}
             if (this.keys['d']) {direction.x += 1; direction.z -= 1;}
             if (this.keys['1']) {this.setAction(this.animations['attack02']);}
+            if (this.keys['r']) {this.reload();}
 
             if (direction.length() > 0) {
                 direction.normalize();
@@ -134,6 +137,7 @@ class Player {
             console.log("O jogador foi derrotado.");
             this.isDied = true;
             this.setAction(this.animations['dying']);
+            this.mesh.position.y += 0.15;
             setTimeout(() => { this.setAction(this.animations['died']); }, 3000);
         }
     }
@@ -151,17 +155,44 @@ class Player {
     }
 
     updateHUD() {
-        document.getElementById('ammo').textContent = `Munição: ${this.ammo}`;
-        document.getElementById('health').textContent = `Vida: ${this.health}`;
+        const healthBar = document.getElementById('health-bar');
+        const healthText = document.getElementById('health-text');
+        const ammoText = document.getElementById('ammo');
+    
+        const healthPercentage = (this.health / 100) * 100;
+        healthBar.style.width = `${healthPercentage}%`;
+        healthText.textContent = `Vida: ${this.health}`;
+        ammoText.textContent = `Munição: ${this.ammo}`;
     }
 
     updateCamera(camera, cameraDistance) {
-        camera.position.set(
-            this.mesh.position.x + cameraDistance,
-            this.mesh.position.y + cameraDistance + 1,
-            this.mesh.position.z + cameraDistance
-        );
-        camera.lookAt(this.mesh.position);
+        if (this.isDied) {
+            const orbitSpeed = 0.001; // Velocidade de rotação 
+            const distanceSpeed = 0.1; // Velocidade de afastamento 
+            const targetDistance = 60;
+
+            // Aumenta gradualmente a distância atual da câmera
+            if (this.currentCameraDistance < targetDistance) {
+                this.currentCameraDistance += distanceSpeed;
+            }
+
+            this.cameraOrbitAngle += orbitSpeed;
+
+            // Calcula a nova posição da câmera para orbitar em torno do ponto (0, 0, 0)
+            const x = Math.cos(this.cameraOrbitAngle) * this.currentCameraDistance;
+            const z = Math.sin(this.cameraOrbitAngle) * this.currentCameraDistance;
+            const y = this.currentCameraDistance / 2;
+
+            camera.position.set(x, y, z);
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+        } else {
+            camera.position.set(
+                this.mesh.position.x + cameraDistance,
+                this.mesh.position.y + cameraDistance + 1,
+                this.mesh.position.z + cameraDistance
+            );
+            camera.lookAt(this.mesh.position);
+        }
     }
 
     shoot(scene, projectiles, direction, startPosition, delta) {

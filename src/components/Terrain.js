@@ -7,6 +7,7 @@ class Terrain {
         this.height = height;
         this.radialSegments = radialSegments;
         this.heightSegments = heightSegments;
+        this.pieces = [];
         this.createCylinder(scene, imagem);
         this.createRing(scene, ringImage);     
         this.createTorus(scene, imagem);
@@ -33,6 +34,7 @@ class Terrain {
         cylinder.castShadow = true;
         cylinder.receiveShadow = true;
         scene.add(cylinder);
+        this.pieces.push(cylinder);
     }
 
     createRing(scene, ringImage) {
@@ -46,7 +48,7 @@ class Terrain {
         if (ringImage) {
             const textureLoader = new THREE.TextureLoader();
             textureLoader.load(ringImage, (texture) => {
-                const material = new THREE.MeshStandardMaterial({ map: texture, side: THREE.DoubleSide });
+                const material = new THREE.MeshStandardMaterial({ map: texture, side: THREE.DoubleSide, emissive: 0xff0000, emissiveIntensity: 0.5 });
                 this.createRingMesh(scene, geometry, material);
             });
         } else {
@@ -62,6 +64,7 @@ class Terrain {
         ring.castShadow = false;
         ring.receiveShadow = false;
         scene.add(ring);
+        this.pieces.push(ring);
         return ring;
     }
     
@@ -93,12 +96,13 @@ class Terrain {
         torus.castShadow = true;
         torus.receiveShadow = true;
         scene.add(torus);
+        this.pieces.push(torus);
     }
 
     createSurfaceRing(scene, ringImage) {
         // Parâmetros para o anel da superfície
         const innerRadius = this.radius + 6;
-        const outerRadius = innerRadius + 6;  
+        const outerRadius = innerRadius + 12;  
         const segments = 64;
     
         const geometry = new THREE.RingGeometry(innerRadius, outerRadius, segments);
@@ -108,7 +112,7 @@ class Terrain {
             textureLoader.load(ringImage, (texture) => {
                 const material = new THREE.MeshStandardMaterial({ map: texture, side: THREE.DoubleSide });
                 const sfRing = this.createRingMesh(scene, geometry, material, this.height + 0.5); 
-                sfRing.castShadow = true;
+                sfRing.castShadow = false;
                 sfRing.receiveShadow = true;    
                 this.loadFBXObjects(scene, innerRadius, outerRadius, this.height + 0.51);
             });
@@ -139,7 +143,7 @@ class Terrain {
             });
         
             setTimeout(() => {
-                this.addRandomObjectsOnRing(scene, pineTrees, innerRadius, outerRadius, height, 5);
+                this.addRandomObjectsOnRing(scene, pineTrees, innerRadius, outerRadius, height, 20);
             }, 2000);
         });
         
@@ -154,7 +158,7 @@ class Terrain {
             });
         
             setTimeout(() => {
-                this.addRandomObjectsOnRing(scene, deadTrees, innerRadius, outerRadius, height, 5);
+                this.addRandomObjectsOnRing(scene, deadTrees, innerRadius, outerRadius, height, 20);
             }, 2000); 
         });
         
@@ -169,7 +173,7 @@ class Terrain {
             });
         
             setTimeout(() => {
-                this.addRandomObjectsOnRing(scene, rocks, innerRadius, outerRadius, height, 5);
+                this.addRandomObjectsOnRing(scene, rocks, innerRadius, outerRadius, height, 20);
             }, 2000); 
         });
     }

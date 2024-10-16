@@ -1,10 +1,9 @@
 import * as THREE from 'three';
-import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import Utils from '../utils/Utils.js';
 import Projectile from './Projectile.js';
 
 class Enemy {
-    constructor(scene, position) {
+    constructor(scene, position, fbxLoader) {
         this.scene = scene;
         this.balls = [];
         this.particleSystems = [];  // Armazena os sistemas de partículas
@@ -17,27 +16,28 @@ class Enemy {
         this.randomMoveTime = 0;
         this.velocity = 1;
         this.bulletSpeed = 8;
-        this.detectionRange = 15; // Distância para o inimigo detectar o jogador
+        this.detectionRange = 20; // Distância para o inimigo detectar o jogador
         this.chaseDistance = 8; // Distância para o inimigo atacar o jogador
         this.health = 100;
         this.shieldReduction = 0.5;
         this.damage = 20;
+        this.fbxLoader = fbxLoader;
 
         this.loadModel(position);
-        this.createOrbitBalls(scene, 3);  // 3 bolas orbitais
+        setTimeout(() => {this.createOrbitBalls(scene, 3);}, 1000);  // 3 bolas orbitais
     }
 
     loadModel(position) {
-        const fbxLoader = new FBXLoader();
-        fbxLoader.load('assets/models/Ghost_Skull.fbx', (object) => {
+        // const fbxLoader = new FBXLoader();
+        this.fbxLoader.load('assets/models/Skull.fbx', (object) => {
             object.traverse(function (meshs) {
                 if (meshs instanceof THREE.Mesh) {
                     meshs.castShadow = true;
-                    meshs.receiveShadow = true;
+                    meshs.receiveShadow = false;
                 }
             });
 
-            Utils.changeModelScale(object, 1);
+            Utils.changeModelScale(object, 0.5);
             object.position.set(position.x, position.y, position.z);
             this.scene.add(object);
             this.mesh = object;
@@ -199,19 +199,22 @@ class Enemy {
     
     move(player, deltaTime) {
         let playerPosition = player.mesh.position;
-        const distanceToPlayer = this.mesh.position.distanceTo(playerPosition);
+        if(this.mesh){
+            const distanceToPlayer = this.mesh.position.distanceTo(playerPosition);
     
-        if (distanceToPlayer <= this.detectionRange && !player.isDied) {
-            this.mesh.lookAt(playerPosition);
+            if (distanceToPlayer <= this.detectionRange && !player.isDied) {
+                this.mesh.lookAt(playerPosition);
+            }
+        
+            if (distanceToPlayer > this.chaseDistance && distanceToPlayer <= this.detectionRange && !player.isDied) {
+                this.moveTo(playerPosition, deltaTime, true); // Persegue o jogador
+            } else if (distanceToPlayer <= this.chaseDistance && !player.isDied) {
+                this.moveTo(playerPosition, deltaTime, false); // Afasta-se do jogador
+            } else {
+                this.moveRandomly(deltaTime); // Movimento aleatório
+            }
         }
-    
-        if (distanceToPlayer > this.chaseDistance && distanceToPlayer <= this.detectionRange && !player.isDied) {
-            this.moveTo(playerPosition, deltaTime, true); // Persegue o jogador
-        } else if (distanceToPlayer <= this.chaseDistance && !player.isDied) {
-            this.moveTo(playerPosition, deltaTime, false); // Afasta-se do jogador
-        } else {
-            this.moveRandomly(deltaTime); // Movimento aleatório
-        }
+        
     }
 
     moveTo(targetPosition, deltaTime, isTowards) {
