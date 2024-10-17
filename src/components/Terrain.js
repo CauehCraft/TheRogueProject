@@ -143,7 +143,7 @@ class Terrain {
             });
         
             setTimeout(() => {
-                this.addRandomObjectsOnRing(scene, pineTrees, innerRadius, outerRadius, height, 20);
+                this.addRandomObjectsOnRing(scene, pineTrees, innerRadius, outerRadius, height, 100);
             }, 2000);
         });
         
@@ -158,7 +158,7 @@ class Terrain {
             });
         
             setTimeout(() => {
-                this.addRandomObjectsOnRing(scene, deadTrees, innerRadius, outerRadius, height, 20);
+                this.addRandomObjectsOnRing(scene, deadTrees, innerRadius, outerRadius, height, 100);
             }, 2000); 
         });
         
@@ -173,7 +173,7 @@ class Terrain {
             });
         
             setTimeout(() => {
-                this.addRandomObjectsOnRing(scene, rocks, innerRadius, outerRadius, height, 20);
+                this.addRandomObjectsOnRing(scene, rocks, innerRadius, outerRadius, height, 100);
             }, 2000); 
         });
     }

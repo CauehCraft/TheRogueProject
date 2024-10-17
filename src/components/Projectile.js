@@ -29,7 +29,7 @@ class Projectile {
             if (CollisionSystem.checkCollision(this.mesh, enemy.mesh)) {
                 scene.remove(this.mesh);
                 projectiles.splice(projectiles.indexOf(this), 1);
-                enemy.takeDamage(this.damage);
+                enemy.takeDamage(this.damage, this.player);
             } 
         });
     } else {

@@ -160,7 +160,7 @@ class Enemy {
         });
     }
 
-    takeDamage(damageAmount) {
+    takeDamage(damageAmount, player) {
         if (this.forceField) { // Verifica se há um escudo ativo
             damageAmount *= this.shieldReduction; // Reduz o dano conforme o escudo
         }
@@ -168,13 +168,14 @@ class Enemy {
         console.log(`Inimigo recebeu ${damageAmount} de dano. Saúde restante: ${this.health}`);
 
         if (this.health <= 0) { // Verifica se o inimigo morreu
-            this.die();
+            this.die(player);
         }
     }
 
-    die() {
+    die(player) {
         console.log("Um inimigo foi derrotado.");
         this.removeFromScene(this.scene);
+        player.addScore(1);
     }
 
     update(time, deltaTime, player, scene){
@@ -273,7 +274,7 @@ class Enemy {
     }
 
     createForceField(scene) {
-        const geometry = new THREE.SphereGeometry(1.0, 16, 16); // Ajuste o tamanho do campo
+        const geometry = new THREE.SphereGeometry(0.5, 10, 10);
         const material = new THREE.MeshBasicMaterial({ 
             color: 0xff4500, 
             wireframe: true, 
@@ -282,7 +283,6 @@ class Enemy {
         });
         this.forceField = new THREE.Mesh(geometry, material);
         this.forceField.position.copy(this.mesh.position);
-        this.forceField.position.y = 1.3;
         scene.add(this.forceField);
     }
     

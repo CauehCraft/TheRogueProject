@@ -25,6 +25,7 @@ class Player {
         this.isDied = false;
         this.cameraOrbitAngle = 0;
         this.currentCameraDistance = 0
+        this.score = 0;
 
         window.addEventListener('keydown', (event) => this.keys[event.key] = true);
         window.addEventListener('keyup', (event) => this.keys[event.key] = false);
@@ -158,11 +159,17 @@ class Player {
         const healthBar = document.getElementById('health-bar');
         const healthText = document.getElementById('health-text');
         const ammoText = document.getElementById('ammo');
-    
+        const scoreText = document.getElementById('score');
+
         const healthPercentage = (this.health / 100) * 100;
         healthBar.style.width = `${healthPercentage}%`;
         healthText.textContent = `Vida: ${this.health}`;
         ammoText.textContent = `Munição: ${this.ammo}`;
+        scoreText.textContent = `Pontuação: ${this.score}`;
+    }
+
+    addScore(score){
+        this.score += score;
     }
 
     updateCamera(camera, cameraDistance) {
@@ -203,10 +210,10 @@ class Player {
             this.velocity *= 0.25;
             this.mesh.lookAt(this.mesh.position.clone().add(direction));
             setTimeout(() => { // timeout para atirar na metade do tempo de disparo
-                const projectile = new Projectile(startPosition, direction, 15*delta, this.damage);
+                const projectile = new Projectile(startPosition, direction, 15*delta, this.damage, false, null, this);
                 projectiles.push(projectile);
                 scene.add(projectile.mesh);
-                setTimeout(() => { // timeout para remover o projetil depois de 3 segundos
+                setTimeout(() => { // timeout para remover o projetil depois de 5 segundos
                     scene.remove(projectile.mesh);
                     const index = projectiles.indexOf(projectile);
                     if (index > -1) {

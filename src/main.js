@@ -12,6 +12,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xc2d0df);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 // const camera = new THREE.OrthographicCamera( window.innerWidth / - 150, window.innerWidth / 150, window.innerHeight / 150, window.innerHeight / - 150, 1, 1000 );
+camera.position.y = 10;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.shadowMap.enabled = true;
@@ -112,7 +113,7 @@ function animate() {
         player.update(delta, camera, cameraDistance);
         const time = clock.getElapsedTime();
         enemies.forEach(enemy => enemy.update(time, delta, player, scene));
-        Utils.clampEnemiesToMap(player, enemies, mapSize);
+        Utils.clampEntitiesToMap(player, enemies, mapSize);
         Utils.updateLight(light, scene, time, 48);
     }
     renderer.render(scene, camera);
