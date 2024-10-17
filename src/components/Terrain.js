@@ -102,7 +102,7 @@ class Terrain {
     createSurfaceRing(scene, ringImage) {
         // Parâmetros para o anel da superfície
         const innerRadius = this.radius + 6;
-        const outerRadius = innerRadius + 12;  
+        const outerRadius = innerRadius + 12; // tamanho da area onde nascem os objetos 
         const segments = 64;
     
         const geometry = new THREE.RingGeometry(innerRadius, outerRadius, segments);
@@ -180,7 +180,7 @@ class Terrain {
 
     addRandomObjectsOnRing(scene, objectsArray, innerRadius, outerRadius, height, count) {
         for (let i = 0; i < count; i++) {
-            const randomIndex = Math.floor(Math.random() * objectsArray.length);
+            const randomIndex = Math.floor(Math.random() * objectsArray.length); // pega um index aleatorio do array
             const originalMesh = objectsArray[randomIndex].clone(); // Cria uma cópia do Mesh
             originalMesh.scale.set(1, 1, 1);
             
