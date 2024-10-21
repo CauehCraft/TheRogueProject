@@ -4,6 +4,7 @@ import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 // import CollisionSystem from './systems/CollisionSystem.js';
 // import Projectile from './components/Projectile.js';
 import Terrain from './components/Terrain.js';
+import Background from './components/Background.js';
 import Player from './components/Player.js';
 import Enemy from './components/Enemy.js';
 import Utils from './utils/Utils.js';
@@ -25,9 +26,10 @@ const mapSize = 30;
 let enemySpawnInterval = 15000; // Spawn dos inimigos (15 segundos)
 let enemySpawnTimer;
 
+
 const player = new Player(scene, 'assets/models/mutant.fbx');
 const terrain = new Terrain(scene, mapSize, 1, 64, 1, 'assets/textures/Ground3.png', 'assets/textures/Lava.png');
-
+const background = new Background(scene, 8);
 const light = Utils.addLightAndShadows(scene);
 const fbxLoader = new FBXLoader();
 
@@ -118,6 +120,7 @@ function animate() {
     }
     renderer.render(scene, camera);
     stats.update();
+    background.update();
 }
 
 animate();

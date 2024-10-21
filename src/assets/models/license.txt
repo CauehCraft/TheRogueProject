@@ -1,0 +1,11 @@
+Model Information:
+* title:	[Extracted] Minecraft Java Edition's Stars
+* source:	https://sketchfab.com/3d-models/extracted-minecraft-java-editions-stars-c8868b7ffc4a473eb5cd9203a59e3650
+* author:	AjaxGb (https://sketchfab.com/ajaxgb)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "[Extracted] Minecraft Java Edition's Stars" (https://sketchfab.com/3d-models/extracted-minecraft-java-editions-stars-c8868b7ffc4a473eb5cd9203a59e3650) by AjaxGb (https://sketchfab.com/ajaxgb) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
