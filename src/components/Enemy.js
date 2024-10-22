@@ -3,8 +3,9 @@ import Utils from '../utils/Utils.js';
 import Projectile from './Projectile.js';
 
 class Enemy {
-    constructor(scene, position, fbxLoader) {
+    constructor(scene, position, fbxLoader, camera) {
         this.scene = scene;
+        this.camera = camera;
         this.balls = [];
         this.particleSystems = [];  // Armazena os sistemas de partículas
         this.projectiles = [];
@@ -25,6 +26,20 @@ class Enemy {
 
         this.loadModel(position);
         setTimeout(() => {this.createOrbitBalls(scene, 3);}, 1000);  // 3 bolas orbitais
+    }
+
+    shootAtPlayerSound(camera) {
+        // 3. Adicionando efeitos sonoros (exemplo para tiros)
+        const listener = new THREE.AudioListener();
+        camera.add(listener); // O som será captado da posição da câmera
+        const shotSound = new THREE.Audio(listener);
+        const audioLoader = new THREE.AudioLoader();
+
+        audioLoader.load('assets/audio/fireball_sound_effect.mp3', (buffer) => {
+            shotSound.setBuffer(buffer);
+            shotSound.setVolume(1.0); // Volume do tiro
+            shotSound.play(); // Função para disparar o som quando necessário
+        });
     }
 
     loadModel(position) {
@@ -247,6 +262,7 @@ class Enemy {
 
 
     shootAtPlayer(player, scene, deltaTime) {
+        this.shootAtPlayerSound(this.camera);
         let playerPosition = player.mesh.position;
         if (this.balls.length > 0) {
             const ball = this.balls.pop(); // Retira a bola da lista de bolas orbitais

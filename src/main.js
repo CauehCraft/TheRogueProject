@@ -23,7 +23,7 @@ document.body.appendChild(renderer.domElement);
 window.addEventListener('resize', (event) => Utils.onWindowResize(camera, renderer));
 
 const mapSize = 30;
-let enemySpawnInterval = 15000; // Spawn dos inimigos (15 segundos)
+let enemySpawnInterval = 5000; // Spawn dos inimigos (15 segundos)
 let enemySpawnTimer;
 
 
@@ -39,7 +39,7 @@ function spawnEnemy() {
     const x = (Math.random() - 0.5) * mapSize * 2; // Gera X entre -mapSize e +mapSize
     const z = (Math.random() - 0.5) * mapSize * 2; // Gera Z entre -mapSize e +mapSize
     const position = new THREE.Vector3(x, 1, z);
-    const enemy = new Enemy(scene, position, fbxLoader);
+    const enemy = new Enemy(scene, position, fbxLoader, camera);
     enemies.push(enemy);
 }
 
