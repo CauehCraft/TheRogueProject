@@ -23,7 +23,7 @@ document.body.appendChild(renderer.domElement);
 window.addEventListener('resize', (event) => Utils.onWindowResize(camera, renderer));
 
 const mapSize = 30;
-let enemySpawnInterval = 5000; // Spawn dos inimigos (15 segundos)
+let enemySpawnInterval = 15000; // Spawn dos inimigos (15 segundos)
 let enemySpawnTimer;
 
 

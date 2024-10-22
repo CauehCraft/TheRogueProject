@@ -262,9 +262,9 @@ class Enemy {
 
 
     shootAtPlayer(player, scene, deltaTime) {
-        this.shootAtPlayerSound(this.camera);
         let playerPosition = player.mesh.position;
         if (this.balls.length > 0) {
+            this.shootAtPlayerSound(this.camera);
             const ball = this.balls.pop(); // Retira a bola da lista de bolas orbitais
             const direction = new THREE.Vector3().subVectors(playerPosition, ball.position).normalize();
             direction.y = 0;
@@ -272,12 +272,18 @@ class Enemy {
             projectile.particleSystem = this.particleSystems.find(ps => ps.ball === ball)?.particleSystem; // Associa as particulas da bola ao projetil
             scene.add(projectile.mesh);
             this.projectiles.push(projectile);
+
+            // Verifica o índice do projétil
+            const index = this.projectiles.indexOf(projectile);
+            console.log("Índice do projétil:", index); // Log para verificar se o projétil foi encontrado
+
+
             setTimeout(() => { // timeout para remover o projetil depois de 3 segundos
                 scene.remove(projectile.mesh);
                 scene.remove(projectile.particleSystem);
-                const index = projectiles.indexOf(projectile);
+                const index = this.projectiles.indexOf(projectile);
                 if (index > -1) {
-                    projectiles.splice(index, 1);
+                    this.projectiles.splice(index, 1); // Remove o projétil da lista
                 }
             }, 3000);
             if(this.balls.length == 0){
