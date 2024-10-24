@@ -24,11 +24,12 @@ class Player {
         this.damage = 35;
         this.isDied = false;
         this.cameraOrbitAngle = 0;
-        this.currentCameraDistance = 0
+        this.currentCameraDistance = 2;
         this.score = 0;
+        this.deadCountdown = 250;
 
-        window.addEventListener('keydown', (event) => this.keys[event.key] = true);
-        window.addEventListener('keyup', (event) => this.keys[event.key] = false);
+        window.addEventListener('keydown', (event) => this.keys[event.key.toLowerCase()] = true);
+        window.addEventListener('keyup', (event) => this.keys[event.key.toLowerCase()] = false);
     }
 
     loadModelAndAnimations() {
@@ -174,7 +175,8 @@ class Player {
 
     updateCamera(camera, cameraDistance) {
         if (this.isDied) {
-            const orbitSpeed = 0.001; // Velocidade de rotação 
+            if(this.deadCountdown <= 0){
+                const orbitSpeed = 0.001; // Velocidade de rotação 
             const distanceSpeed = 0.1; // Velocidade de afastamento 
             const targetDistance = 60;
 
@@ -192,6 +194,8 @@ class Player {
 
             camera.position.set(x, y, z);
             camera.lookAt(new THREE.Vector3(0, 0, 0));
+            } else this.deadCountdown -= 1;
+            
         } else {
             camera.position.set(
                 this.mesh.position.x + cameraDistance,

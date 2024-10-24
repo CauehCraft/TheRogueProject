@@ -4,6 +4,7 @@ import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 // import CollisionSystem from './systems/CollisionSystem.js';
 // import Projectile from './components/Projectile.js';
 import Terrain from './components/Terrain.js';
+import Background from './components/Background.js';
 import Player from './components/Player.js';
 import Enemy from './components/Enemy.js';
 import Utils from './utils/Utils.js';
@@ -25,9 +26,10 @@ const mapSize = 30;
 let enemySpawnInterval = 15000; // Spawn dos inimigos (15 segundos)
 let enemySpawnTimer;
 
+
 const player = new Player(scene, 'assets/models/mutant.fbx');
 const terrain = new Terrain(scene, mapSize, 1, 64, 1, 'assets/textures/Ground3.png', 'assets/textures/Lava.png');
-
+const background = new Background(scene, 8);
 const light = Utils.addLightAndShadows(scene);
 const fbxLoader = new FBXLoader();
 
@@ -37,7 +39,7 @@ function spawnEnemy() {
     const x = (Math.random() - 0.5) * mapSize * 2; // Gera X entre -mapSize e +mapSize
     const z = (Math.random() - 0.5) * mapSize * 2; // Gera Z entre -mapSize e +mapSize
     const position = new THREE.Vector3(x, 1, z);
-    const enemy = new Enemy(scene, position, fbxLoader);
+    const enemy = new Enemy(scene, position, fbxLoader, camera);
     enemies.push(enemy);
 }
 
@@ -59,6 +61,42 @@ const projectiles = [];
 const cameraDistance = 5;
 
 const clock = new THREE.Clock();
+
+// ÁUDIO AREA ---------------------------------------------------------------------------------
+// 1. Adicionando o listener de áudio na cena (normalmente atrelado à câmera)
+const listener = new THREE.AudioListener();
+camera.add(listener); // O som será captado da posição da câmera
+
+// 2. Carregando e tocando uma música de fundo
+const audioLoader = new THREE.AudioLoader();
+const backgroundMusic = new THREE.Audio(listener); // O som estará atrelado ao listener (câmera)
+
+function audioLoaderAfterGameStart () {
+    audioLoader.load('assets/audio/lava_sound_effect.mp3', (buffer) => {
+        if (!buffer) {
+            console.error('Erro ao carregar o áudio');
+            return;
+        }
+        console.log('Áudio carregado com sucesso');
+        
+        backgroundMusic.setBuffer(buffer);
+        backgroundMusic.setLoop(true); // Loop para a música de fundo
+        backgroundMusic.setVolume(0.2); // Volume da música de fundo
+        backgroundMusic.play(); // Inicia a reprodução da música
+    });
+}
+
+// 3. Adicionando efeitos sonoros (exemplo para tiros)
+const shotSound = new THREE.Audio(listener);
+
+audioLoader.load('assets/audio/Star_Wars_Blaster_Shot.mp3', (buffer) => {
+    shotSound.setBuffer(buffer);
+    shotSound.setVolume(1.0); // Volume do tiro
+});
+
+function playShotSound() {
+    shotSound.play(); // Função para disparar o som quando necessário
+}
 
 // Contador de fps
 const stats = new Stats();
@@ -87,6 +125,10 @@ function onMouseClick(event) {
         const direction = new THREE.Vector3().subVectors(targetPosition, projectileStartPosition).normalize();
         const delta = clock.getDelta();
         player.shoot(scene, projectiles, direction, projectileStartPosition, delta);
+        
+        if (player.ammo > 0) {
+            playShotSound();
+        }
     }
 }
 
@@ -96,6 +138,7 @@ document.getElementById('start-game').addEventListener('click', () => {
     isGameStarted = true;
     document.getElementById('start-game').style.display = 'none';
     startSpawningEnemies();
+    audioLoaderAfterGameStart();
 });
 
 
@@ -118,6 +161,7 @@ function animate() {
     }
     renderer.render(scene, camera);
     stats.update();
+    background.update();
 }
 
 animate();
